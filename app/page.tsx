@@ -1,8 +1,8 @@
 "use client";
 
-// import { useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-// import { client } from "@/lib/client";
+import { client } from "@/lib/client";
 import { Suspense } from "react";
 
 const Page = () => {
@@ -22,15 +22,15 @@ function Home() {
   const wasDestroyed = searchParams.get("destroyed") === "true";
   const error = searchParams.get("error");
 
-  // const { mutate: createRoom } = useMutation({
-  //   mutationFn: async () => {
-  //     const res = await client.room.create.post();
+  const { mutate: createRoom } = useMutation({
+    mutationFn: async () => {
+      const res = await client.room.create.post();
 
-  //     if (res.status === 200) {
-  //       router.push(`/room/${res.data?.roomId}`);
-  //     }
-  //   },
-  // });
+      if (res.status === 200) {
+        router.push(`/room/${res.data?.roomId}`);
+      }
+    },
+  });
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4">
