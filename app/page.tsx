@@ -1,8 +1,8 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+// import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { client } from "@/lib/client";
+// import { client } from "@/lib/client";
 import { Suspense } from "react";
 
 const Page = () => {
@@ -16,21 +16,21 @@ const Page = () => {
 export default Page;
 
 function Home() {
-  const { username } = useUsername();
+  // const { username } = useUsername();
   const router = useRouter();
   const searchParams = useSearchParams();
   const wasDestroyed = searchParams.get("destroyed") === "true";
   const error = searchParams.get("error");
 
-  const { mutate: createRoom } = useMutation({
-    mutationFn: async () => {
-      const res = await client.room.create.post();
+  // const { mutate: createRoom } = useMutation({
+  //   mutationFn: async () => {
+  //     const res = await client.room.create.post();
 
-      if (res.status === 200) {
-        router.push(`/room/${res.data?.roomId}`);
-      }
-    },
-  });
+  //     if (res.status === 200) {
+  //       router.push(`/room/${res.data?.roomId}`);
+  //     }
+  //   },
+  // });
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4">
@@ -78,7 +78,7 @@ function Home() {
 
               <div className="flex items-center gap-3">
                 <div className="flex-1 bg-zinc-950 border border-zinc-800 p-3 text-sm text-zinc-400 font-mono">
-                  {username}
+                  {/* {username} */}
                 </div>
               </div>
             </div>
