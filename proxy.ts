@@ -18,23 +18,19 @@ export const proxy = async (req: NextRequest) => {
     return NextResponse.redirect(new URL("/?error=room-not-found", req.url));
   }
 
-  const existingToken = req.cookies.get("x-auth-token")?.value;
-
-  // USER IS ALLOWED TO JOIN ROOM
+  // Check if user allowed to connect to room or not
+  const existingToken = req.cookies.get("auth-token")?.value;
   if (existingToken && meta.connected.includes(existingToken)) {
     return NextResponse.next();
   }
-
-  // USER IS NOT ALLOWED TO JOIN
   if (meta.connected.length >= 2) {
     return NextResponse.redirect(new URL("/?error=room-full", req.url));
   }
 
   const response = NextResponse.next();
-
   const token = nanoid();
 
-  response.cookies.set("x-auth-token", token, {
+  response.cookies.set("auth-token", token, {
     path: "/",
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
