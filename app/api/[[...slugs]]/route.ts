@@ -52,7 +52,6 @@ const messages = new Elysia({ prefix: "/messages" })
     async ({ body, auth }) => {
       const { sender, text } = body;
       const { roomId } = auth;
-
       const roomExists = await redis.exists(`meta:${roomId}`);
 
       if (!roomExists) {
