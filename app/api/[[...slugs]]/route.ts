@@ -1,5 +1,5 @@
 import { redis } from "@/lib/redis";
-import { Elysia, t } from "elysia";
+import { Elysia } from "elysia";
 import { nanoid } from "nanoid";
 import { authMiddleware } from "./auth";
 import { z } from "zod";
@@ -66,14 +66,12 @@ const messages = new Elysia({ prefix: "/messages" })
         roomId,
       };
 
-      // add message to history
       await redis.rpush(`messages:${roomId}`, {
         ...message,
         token: auth.token,
       });
       await realtime.channel(roomId).emit("chat.message", message);
-
-      // housekeeping
+      
       const remaining = await redis.ttl(`meta:${roomId}`);
 
       await redis.expire(`messages:${roomId}`, remaining);

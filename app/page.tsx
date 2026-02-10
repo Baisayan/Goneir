@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { client } from "@/lib/client";
 import { Suspense } from "react";
+import { useUsername } from "@/hooks/use-username";
 
 const Page = () => {
   return (
@@ -16,7 +17,7 @@ const Page = () => {
 export default Page;
 
 function Home() {
-  // const { username } = useUsername();
+  const { username } = useUsername();
   const router = useRouter();
   const searchParams = useSearchParams();
   const wasDestroyed = searchParams.get("destroyed") === "true";
@@ -78,7 +79,7 @@ function Home() {
 
               <div className="flex items-center gap-3">
                 <div className="flex-1 bg-zinc-950 border border-zinc-800 p-3 text-sm text-zinc-400 font-mono">
-                  {/* {username} */}
+                  {username}
                 </div>
               </div>
             </div>

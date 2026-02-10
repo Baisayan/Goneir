@@ -6,7 +6,7 @@ import { useRealtime } from "@/lib/realtime-client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function formatTimeRemaining(seconds: number) {
   const mins = Math.floor(seconds / 60);
