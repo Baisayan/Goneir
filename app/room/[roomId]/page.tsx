@@ -17,7 +17,6 @@ function formatTimeRemaining(seconds: number) {
 const Page = () => {
   const params = useParams();
   const roomId = params.roomId as string;
-
   const router = useRouter();
 
   const { username } = useUsername();
@@ -114,7 +113,7 @@ const Page = () => {
             <span className="text-xs text-zinc-500 uppercase">Room ID</span>
             <div className="flex items-center gap-2">
               <span className="font-bold text-green-500 truncate">
-                {roomId.slice(0, 10) + "..."}
+                {roomId}
               </span>
               <button
                 onClick={copyLink}
@@ -149,12 +148,10 @@ const Page = () => {
           onClick={() => destroyRoom()}
           className="text-xs bg-zinc-800 hover:bg-red-600 px-3 py-1.5 rounded text-zinc-400 hover:text-white font-bold transition-all group flex items-center gap-2 disabled:opacity-50"
         >
-          <span className="group-hover:animate-pulse">💣</span>
           DESTROY NOW
         </button>
       </header>
 
-      {/* MESSAGES */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin">
         {messages?.messages.length === 0 && (
           <div className="flex items-center justify-center h-full">
