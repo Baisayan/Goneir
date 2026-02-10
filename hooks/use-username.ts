@@ -1,12 +1,10 @@
 import { nanoid } from "nanoid";
 import { useEffect, useState } from "react";
 
-const ANIMALS = ["wolf", "hawk", "bear", "shark"];
 const STORAGE_KEY = "chat_username";
 
 const generateUsername = () => {
-  const word = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
-  return `anonymous-${word}-${nanoid(5)}`;
+  return `ANON-${nanoid(10)}`;
 };
 
 export const useUsername = () => {

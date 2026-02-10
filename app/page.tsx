@@ -9,14 +9,14 @@ import { useUsername } from "@/hooks/use-username";
 const Page = () => {
   return (
     <Suspense>
-      <Home />
+      <Lobby />
     </Suspense>
   );
 };
 
 export default Page;
 
-function Home() {
+function Lobby() {
   const { username } = useUsername();
   const router = useRouter();
   const searchParams = useSearchParams();
