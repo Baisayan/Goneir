@@ -4,9 +4,55 @@ import { useUsername } from "@/hooks/use-username";
 import { client } from "@/lib/client";
 import { useRealtime } from "@/lib/realtime-client";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { decrypt, encrypt } from "@/lib/encryption";
 import { format } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+
+const DecryptedMessage = ({
+  text,
+  encryptionKey,
+}: {
+  text: string;
+  encryptionKey: string | null;
+}) => {
+  const { data: decrypted } = useQuery({
+    queryKey: ["decrypted", text, encryptionKey],
+    queryFn: async () => {
+      if (!encryptionKey) return null;
+      return await decrypt(text, encryptionKey);
+    },
+    staleTime: Infinity,
+    retry: false,
+  });
+
+  if (!encryptionKey) {
+    return (
+      <span className="text-zinc-500 italic flex items-center gap-1">
+        Encrypted Content
+      </span>
+    );
+  }
+
+  if (decrypted === null && encryptionKey) {
+    return (
+      <div className="text-red-500/80 flex items-start gap-2 bg-red-500/10 p-2 rounded text-xs">
+        <div className="flex flex-col">
+          <span className="font-bold">Decryption Failed</span>
+          <span className="opacity-80">
+            The key provided cannot decrypt this message.
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <span className="wrap-break-word whitespace-pre-wrap">
+      {decrypted || <span className="animate-pulse">...</span>}
+    </span>
+  );
+};
 
 function formatTimeRemaining(seconds: number) {
   const mins = Math.floor(seconds / 60);
@@ -25,6 +71,26 @@ const Page = () => {
 
   const [copyStatus, setCopyStatus] = useState("COPY");
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [encryptionKey, setEncryptionKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (hash) {
+        if (hash.length !== 64) {
+          router.push("/?error=invalid-key");
+        } else {
+          setEncryptionKey(hash);
+        }
+      } else {
+        router.push("/?error=missing-key");
+      }
+    };
+
+    handleHashChange();
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, [router]);
 
   const { data: ttlData } = useQuery({
     queryKey: ["ttl", roomId],
@@ -69,8 +135,12 @@ const Page = () => {
 
   const { mutate: sendMessage, isPending } = useMutation({
     mutationFn: async ({ text }: { text: string }) => {
+      const encrypted = encryptionKey
+        ? await encrypt(text, encryptionKey)
+        : text;
+
       await client.messages.post(
-        { sender: username, text },
+        { sender: username, text: encrypted },
         { query: { roomId } },
       );
 
@@ -178,9 +248,12 @@ const Page = () => {
                 </span>
               </div>
 
-              <p className="text-sm text-zinc-300 leading-relaxed break-all">
-                {msg.text}
-              </p>
+              <div className="text-sm text-zinc-300 leading-relaxed break-all">
+                <DecryptedMessage
+                  text={msg.text}
+                  encryptionKey={encryptionKey}
+                />
+              </div>
             </div>
           </div>
         ))}
@@ -202,9 +275,12 @@ const Page = () => {
                   inputRef.current?.focus();
                 }
               }}
-              placeholder="Type message..."
+              placeholder={
+                encryptionKey ? "Type message..." : "Checking encryption..."
+              }
               onChange={(e) => setInput(e.target.value)}
-              className="w-full bg-black border border-zinc-800 focus:border-zinc-700 focus:outline-none transition-colors text-zinc-100 placeholder:text-zinc-700 py-3 pl-8 pr-4 text-sm"
+              disabled={!encryptionKey}
+              className="w-full bg-black border border-zinc-800 focus:border-zinc-700 focus:outline-none transition-colors text-zinc-100 placeholder:text-zinc-700 py-3 pl-8 pr-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
 
@@ -213,7 +289,7 @@ const Page = () => {
               sendMessage({ text: input });
               inputRef.current?.focus();
             }}
-            disabled={!input.trim() || isPending}
+            disabled={!input.trim() || isPending || !encryptionKey}
             className="bg-zinc-800 text-zinc-400 px-6 text-sm font-bold hover:text-zinc-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             SEND
