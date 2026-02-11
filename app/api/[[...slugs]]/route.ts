@@ -82,7 +82,7 @@ const messages = new Elysia({ prefix: "/messages" })
       query: z.object({ roomId: z.string() }),
       body: z.object({
         sender: z.string().max(100),
-        text: z.string().max(1000),
+        text: z.string().max(2000),
       }),
     },
   )
