@@ -3,6 +3,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { client } from "@/lib/client";
+import { generateKey } from "@/lib/encryption";
 import { Suspense } from "react";
 import { useUsername } from "@/hooks/use-username";
 
@@ -28,7 +29,7 @@ function Lobby() {
       const res = await client.room.create.post();
 
       if (res.status === 200) {
-        router.push(`/room/${res.data?.roomId}`);
+        router.push(`/room/${res.data?.roomId}#${generateKey()}`);
       }
     },
   });
@@ -57,6 +58,24 @@ function Lobby() {
             <p className="text-red-500 text-sm font-bold">ROOM FULL</p>
             <p className="text-zinc-500 text-xs mt-1">
               This room is at maximum capacity.
+            </p>
+          </div>
+        )}
+        {error === "missing-key" && (
+          <div className="bg-red-950/50 border border-red-900 p-4 text-center">
+            <p className="text-red-500 text-sm font-bold">CHECK URL</p>
+            <p className="text-zinc-500 text-xs mt-1">
+              The encryption key is missing from the link.
+            </p>
+          </div>
+        )}
+        {error === "invalid-key" && (
+          <div className="bg-red-950/50 border border-red-900 p-4 text-center">
+            <p className="text-red-500 text-sm font-bold">
+              INVALID ENCRYPTION KEY
+            </p>
+            <p className="text-zinc-500 text-xs mt-1">
+              The encryption key provided in the URL seems to be wrong.
             </p>
           </div>
         )}
