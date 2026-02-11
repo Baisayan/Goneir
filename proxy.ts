@@ -11,7 +11,7 @@ export const proxy = async (req: NextRequest) => {
   const roomId = roomMatch[1];
 
   const meta = await redis.hgetall<{ connected: string[]; createdAt: number }>(
-    `meta:${roomId}`,
+    RedisKeys.roomMeta(roomId),
   );
 
   if (!meta) {

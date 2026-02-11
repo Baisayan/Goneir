@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 const STORAGE_KEY = "chat_username";
 
 const generateUsername = () => {
-  return `ANON-${nanoid(10)}`;
+  return `anon-${nanoid(6)}`;
 };
 
 export const useUsername = () => {
